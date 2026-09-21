@@ -15,26 +15,35 @@ jobs:
         include:
           - os: ubuntu-latest
             name: Linux
-            exe_path: ./build/Lab1
           - os: windows-latest
             name: Windows
-            exe_path: ./build/Release/Lab1.exe
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Determine version
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v1.0.* ]]; then
+            N=${GITHUB_REF#refs/tags/v1.0.}
+          else
+            N=${{ github.run_number }}
+          fi
+          echo "VERSION=1.0.$N" >> $GITHUB_ENV
+          echo "Building version: $VERSION"
+
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=1.0.${{ github.run_number }}
+        shell: bash
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ env.VERSION }}
 
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Run program (Linux)
-        if: runner.os == 'Linux'
-        run: ${{ matrix.exe_path }}
-
-      - name: Run program (Windows)
+      - name: Run program
+        run: ./build/Release/Lab1.exe
         if: runner.os == 'Windows'
-        run: ${{ matrix.exe_path }}
-        shell: pwsh
+
+      - name: Run program
+        run: ./build/Lab1
+        if: runner.os == 'Linux'
