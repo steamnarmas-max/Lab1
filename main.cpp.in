@@ -1,5 +1,6 @@
 #include <iostream>
 
-int main(int, char**){
-    std::cout << "Hello, from Lab1!\n";
+int main() {
+    std::cout << "Hello, World! Version 1.0.@PROJECT_VERSION_PATCH@" << std::endl;
+    return 0;
 }
