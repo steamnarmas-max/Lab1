@@ -31,7 +31,7 @@ jobs:
             N=${{ github.run_number }}
           fi
           echo "VERSION=1.0.$N" >> $GITHUB_ENV
-          echo "Building version: $VERSION"
+          echo "Building version: 1.0.$N"
 
       - name: Configure CMake
         shell: bash
@@ -40,10 +40,40 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Run program
-        run: ./build/Release/Lab1.exe
-        if: runner.os == 'Windows'
-
-      - name: Run program
-        run: ./build/Lab1
+      - name: Run program (Linux)
         if: runner.os == 'Linux'
+        run: ./build/Lab1
+
+      - name: Run program (Windows)
+        if: runner.os == 'Windows'
+        run: ./build/Release/Lab1.exe
+
+      - name: Prepare artifact (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p artifact
+          cp build/Lab1 artifact/Lab1-v${{ env.VERSION }}-linux
+
+      - name: Prepare artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p artifact
+          cp build/Release/Lab1.exe artifact/Lab1-v${{ env.VERSION }}-windows.exe
+
+      - name: Upload artifact (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lab1-v${{ env.VERSION }}-linux
+          path: artifact/Lab1-v${{ env.VERSION }}-linux
+          if-no-files-found: error
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lab1-v${{ env.VERSION }}-windows
+          path: artifact/Lab1-v${{ env.VERSION }}-windows.exe
+          if-no-files-found: error
