@@ -15,6 +15,5 @@ configure_file(
     @ONLY
 )
 
-
 add_executable(Lab1 "${CMAKE_CURRENT_BINARY_DIR}/main.cpp")
 
